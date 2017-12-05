@@ -1,3 +1,5 @@
+import java.io.{BufferedWriter, FileWriter}
+
 import org.scalatest._
 import org.umass.ciir.feature._
 
@@ -72,8 +74,15 @@ class ExpandSuite extends FunSuite {
   "sign"
     )
 
+    def save(file:String, list: List[String]) = {
+      val writer = new BufferedWriter(new FileWriter(file))
+      list foreach { x=> writer.write(x); writer.newLine()}
+      writer.close()
+    }
+
+
     val expanded = new LexiconExpander(seedAgree, seedDisagree, 200)
-    println(expanded.aList)
-    println(expanded.bList)
+    save("agreement.txt", expanded.aList)
+    save("disagreement.txt",  expanded.bList)
   }
 }

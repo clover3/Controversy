@@ -84,4 +84,31 @@ class GuardianTest extends FunSuite {
     }
 
   }
+
+  test("Label Test"){
+    val label = GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels").labels
+    println("Total of %d labels".format(label.size))
+    label.slice(0,10) foreach println
+    val id1 = "society_2016_oct_25_speak-polish-saturday-school-language-history"
+    assert(false === label(id1))
+    val id2 = "money_2016_oct_27_maternity-leave-sackings-cost-280m-a-year-says-equality-watchdog"
+    assert(true === label(id2))
+
+    val values : Iterable[Boolean]= (label unzip)._2
+    val nControversy : Int = values.count((x=>x))
+    println("%d of %d is controversial".format(nControversy, label.size))
+  }
+
+  test("Corpus label count"){
+    val articles : List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val label = GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels")
+    val validArticles = articles filter (label.contains)
+    println("%d of %d has label".format(validArticles.size, articles.size ))
+
+
+    val numTrue = validArticles count label.get
+    println("%d of %d is controversial(%f)".format(numTrue, validArticles.size, numTrue.toDouble / validArticles.size))
+
+  }
+
 }

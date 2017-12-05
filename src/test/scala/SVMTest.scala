@@ -68,13 +68,13 @@ class SVMTest extends  FunSuite{
   }
 
   test("wrapper svm"){
-    val instance = Range(0,100) map {i =>
+    val instance : IndexedSeq[Instance] = Range(0,100) map {i =>
       val m1 = List((1,i.toDouble), (2,((i+1)%2).toDouble)).toMap
       val m : scala.collection.immutable.Map[Int,Double] = m1
       new Instance(m)
     }
     val labels = Range(0,100) map {i => (i+2)%2 +1.0 }
-    val model = new Model(instance.toArray, labels.toArray)
+    val model = new Model(instance, labels.toArray)
 
     val test1 = new Instance(List((1,104.0), (2,0.0)).toMap)
     val test2 = new Instance(List((1,18.0), (2,1.0)).toMap)

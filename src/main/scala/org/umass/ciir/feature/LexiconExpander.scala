@@ -34,25 +34,29 @@ class LexiconExpander(seedsA : List[String], seedsB : List[String], targetSize: 
       val candidateA : List[String] = asScalaBuffer(w2v.knnWords(centroidA, targetSize * 2)).toList
       val candidateB = asScalaBuffer(w2v.knnWords(centroidB, targetSize * 2)).toList
 
-      val common : Set[String] = candidateA.intersect(candidateB).toSet
+      val common : Set[String] = (candidateA++seedsA).intersect(candidateB++seedsB).toSet
 
       val candidateScoreA =  candidateA map (x => (x, score(vectorsA, vectorsB)(w2v.vector(x))))
       val candidateScoreB =  candidateB map (x => (x, score(vectorsB, vectorsA)(w2v.vector(x))))
 
-      val scoreMapA = candidateScoreA.toMap
-      val scoreMapB = candidateScoreB.toMap
+      val candidateRankA = candidateScoreA.sortBy((_._2)).unzip._1 zip Range(0,candidateA.size)
+      val candidateRankB = candidateScoreB.sortBy((_._2)).unzip._1 zip Range(0,candidateB.size)
+
+
+      val rankMapA = candidateRankA.toMap
+      val rankMapB = candidateRankB.toMap
 
       def filterA(pair: (String,Double)) : Boolean = {
         val word = pair._1
         if(common contains word)
-          scoreMapA(word) < scoreMapB(word)
+          rankMapA(word) < rankMapB(word)
         else
           false
       }
       def filterB(pair: (String,Double)) : Boolean = {
         val word = pair._1
         if(common contains word)
-          scoreMapB(word) < scoreMapA(word)
+          rankMapB(word) < rankMapA(word)
         else
           false
       }
