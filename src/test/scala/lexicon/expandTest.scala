@@ -81,7 +81,7 @@ class ExpandSuite extends FunSuite {
     }
 
 
-    val expanded = new LexiconExpander(seedAgree, seedDisagree, 200)
+    val expanded = new LexiconExpander(seedAgree, seedDisagree, 1000)
     save("agreement.txt", expanded.aList)
     save("disagreement.txt",  expanded.bList)
   }

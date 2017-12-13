@@ -65,7 +65,7 @@ class LDATest extends FunSuite {
       a.article :: a.comments.slice(0,10)
     }
     val corpus = (articles map extract).flatten
-    val lda = new LDAWrap(corpus)
+    val lda = new LDAWrap(corpus, 100)
     println("Num of topic :", lda.numTopics)
     println("Num words : ", lda.words.size())
     println("p size : ", lda.wordsP.size())
@@ -109,7 +109,7 @@ class LDATest extends FunSuite {
       a.article :: a.comments.slice(0,10)
     }
     val corpus = (articles map extract).flatten
-    val lda = new LDAWrap(corpus)
+    val lda = new LDAWrap(corpus, 100)
 
     val testSample = articles.tail.head
     val article = testSample.article

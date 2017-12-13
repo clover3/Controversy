@@ -1,16 +1,16 @@
-import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
+package classifier
 
 import org.scalatest.FunSuite
 import org.umass.ciir.classifier.{ContrClassifier, LingClassifier, RandomClassifier}
-import org.umass.ciir.feature.{FeatureGenerator, GuardianDataSet}
 import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
-
-import scala.util.Random
+import org.umass.ciir.feature.{FeatureGenerator, GuardianDataSet}
 import org.umass.ciir.miscLib._
 import org.umass.ciir.svm.SVMWrap.ParameterTune
 
+import scala.util.Random
+
 class trainTest extends FunSuite {
-  test("ContrClassifier") {
+  test("Controversy Classifier") {
 
     Random.setSeed(0)
     //println("Pickling...")
@@ -34,7 +34,7 @@ class trainTest extends FunSuite {
     val featureGenerator = new FeatureGenerator()
     val lingClassifier = time(new LingClassifier(trainX, label)(featureGenerator), "Training...")
     val randomClassifier = new RandomClassifier(trainX, label)
-
+    val linearClassifier = new LingClassifier(trainX, label)(featureGenerator)
 
     print("Train\t")
     printAccuracy(lingClassifier, trainX)
@@ -42,6 +42,9 @@ class trainTest extends FunSuite {
     printAccuracy(lingClassifier, testX)
     print("Random Test\t")
     printAccuracy(randomClassifier, testX)
+    print("Linear One\t")
+    printAccuracy(linearClassifier, testX)
+    lingClassifier.save("svm.txt")
   }
 
   test("Parameter Tune")

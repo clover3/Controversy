@@ -13,7 +13,7 @@ import cc.mallet.topics.ParallelTopicModel
 import cc.mallet.types.InstanceList
 
 
-class LDAWrap (corpus : List[String]){
+class LDAWrap (corpus : List[String], val numTopics : Int ){
   private val pipeList = new util.ArrayList[Pipe]
 
   // Pipes: lowercase, tokenize, remove stopwords, map to features
@@ -25,7 +25,6 @@ class LDAWrap (corpus : List[String]){
   private val instances = new InstanceList(new SerialPipes(pipeList))
   private val itr = new ArrayIterator(corpus.asJava)
   instances.addThruPipe(itr)
-  val numTopics = 100
   val model = new ParallelTopicModel(numTopics, 1.0, 0.01)
 
   model.addInstances(instances)
@@ -35,7 +34,7 @@ class LDAWrap (corpus : List[String]){
 
   // Run the model for 50 iterations and stop (this is for testing only,
   //  for real applications, use 1000 to 2000 iterations)
-  model.setNumIterations(50)
+  model.setNumIterations(1000)
   model.estimate()
   val inferencer = model.getInferencer()
 
@@ -58,6 +57,7 @@ class LDAWrap (corpus : List[String]){
 
   def getTopic(topicId : Int) : (Int=>Double) = arrIDSorter(topicId)
 
+  // Probability that each candidate is generated from source's topic , normalized by length of sentence
   def estimate(source: String, candidate : List[String]) : IndexedSeq[Double] = {
 
     val pipeList = new util.ArrayList[Pipe]
@@ -74,7 +74,9 @@ class LDAWrap (corpus : List[String]){
     instances.addThruPipe(itr)
     val sourceTopic : Array[Double] = inferencer.getSampledDistribution(instances.get(0), 10, 1, 5)
 
-    def likelihood(candidate : Instance) : Double = {
+    def globalLikelihood(rawSentence : String) : Double = ???
+
+    def LDALikelihood(candidate : Instance) : Double = {
       def score(token:Int) : Double = {
         val logProb = for(
           i <- 0 until numTopics
@@ -92,7 +94,7 @@ class LDAWrap (corpus : List[String]){
 
     val scores = for(
       i <- 1 until items.size()
-    ) yield likelihood(instances.get(i))
+    ) yield LDALikelihood(instances.get(i))
     scores
   }
 }

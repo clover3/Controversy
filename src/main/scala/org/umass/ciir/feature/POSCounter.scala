@@ -51,14 +51,23 @@ class POSCounter( mode:Int = POSOption.Simple) {
   def count(input:String) : Map[String, Int] = {
     val taggedString = tagger.tagString(input)
     def split_tag(rawTag: String) : (String,String) = {
-      val loc = rawTag.lastIndexOf("_")
-      val word = rawTag.substring(0,loc)
-      val fullTag = rawTag.substring(loc+1)
+      try {
+        val loc = rawTag.lastIndexOf("_")
+        val word = rawTag.substring(0, loc)
+        val fullTag = rawTag.substring(loc + 1)
 
-      if(mode == POSOption.Full)
-        (word,fullTag)
-      else
-        (word,fullTag.take(2))
+        if (mode == POSOption.Full)
+          (word, fullTag)
+        else
+          (word, fullTag.take(2))
+      }
+      catch{
+        case e: StringIndexOutOfBoundsException => {
+          println(rawTag)
+          ("??", rawTag)
+        }
+
+      }
     }
     val tokens = taggedString.split(" ") map split_tag
     val posGroup = (tokens groupBy ( _._2))
@@ -69,6 +78,7 @@ class POSCounter( mode:Int = POSOption.Simple) {
       case POSOption.Simple => countMap
       case POSOption.Full => countMap
     }
+
   }
 
   def getVector(input: String) : List[Double] = {

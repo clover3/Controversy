@@ -14,4 +14,5 @@ class LingClassifier (X : List[ArticleStructure], label: ControversyLabel)(impli
     if(d > 0) true
     else false
   }
+  def save(path:String) = model.save(path)
 }

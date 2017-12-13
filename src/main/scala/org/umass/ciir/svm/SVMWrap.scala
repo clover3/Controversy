@@ -40,13 +40,13 @@ package SVMWrap {
     val data = inst zip label
 
 
-    def getParam(C : Double, nu : Double) : svm_parameter = {
+    def getParam(C : Double, gamma : Double) : svm_parameter = {
       val param = new svm_parameter()
       param.svm_type = svm_parameter.ONE_CLASS
       param.kernel_type = svm_parameter.LINEAR
-      param.gamma = 0.0001
+      param.gamma = gamma
       param.C = C
-      param.nu = nu
+      param.nu = 0.01
       param
     }
 
@@ -91,16 +91,16 @@ package SVMWrap {
     }
 
 
-    val gammaCandidate = List(0.00001, .0001, 0.001)
-    val CCandidate = List(0.00001, 0.0001, 0.001)
+    val gammaCandidate = List(0.0001, .001, 0.01, 0.1 )
+    val CCandidate = List(0.00001, 0.0001, 0.01)
     val nuCandidate =List(0, 0.1, 0.2, 0.3, 0.5, 0.6)
     val params = for {
-      //gamma <- gammaCandidate
+      gamma <- gammaCandidate
       c <- CCandidate
-      nu <- nuCandidate
-    } yield getParam(c, nu)
+      //nu <- nuCandidate
+    } yield getParam(c, gamma)
 
-    val paramResult = params map { p => Future{ (p.C, p.nu, getPerformance(p) )}}
+    val paramResult = params map { p => Future{ (p.C, p.gamma, getPerformance(p) )}}
     val report = Await.result(Future.sequence(paramResult),Duration.Inf)
     val best = report.maxBy(_._3)
   }
@@ -110,19 +110,40 @@ package SVMWrap {
     val param = new svm_parameter()
     param.svm_type = svm_parameter.ONE_CLASS
     param.kernel_type = svm_parameter.LINEAR
-    param.gamma = 0.0001
-    param.C = 0.0001
+    param.gamma = 0.01
+    param.C = 0.001
     param.nu = 0.3
 
     val prob = new svm_problem()
     prob.l = inst.size
     prob.y = label
     prob.x = inst map (_.instance)
-    svm.svm_check_parameter(prob,param)
+    svm.svm_check_parameter(prob, param)
     val model = svm.svm_train(prob, param)
+    //printData()
 
     def predict(sample: Instance): Double = {
       svm.svm_predict(model, sample.instance)
     }
+
+    def save(path: String) = {
+      svm.svm_save_model(path, model)
+    }
+
+    def printData(): Unit = {
+
+      val r : Array[Array[(Int, Double)]] = (model.sv_coef.flatten zip model.SV) map { x =>
+        val weight : Double = x._1
+        val sv : Array[svm_node] = x._2
+        sv map (n => (n.index, n.value*weight))
+      }
+      def sumPair(l : Iterable[(Int, Double)]) = {
+        val (a,b) = l.unzip
+        b.sum
+      }
+      val featureWeight : Iterable[(Int, Double)] = (r.flatten.groupBy { x => x._1})map( y => (y._1, sumPair(y._2)))
+      featureWeight foreach (x => print("%d->%f, ".format(x._1,x._2) ))
+    }
+
   }
 }

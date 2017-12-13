@@ -1,4 +1,4 @@
-import java.io.{File, PrintWriter}
+import java.io.{BufferedWriter, File, FileWriter, PrintWriter}
 
 import play.api.libs.json._
 import com.github.tototoshi.csv.CSVReader
@@ -90,9 +90,9 @@ class GuardianTest extends FunSuite {
     println("Total of %d labels".format(label.size))
     label.slice(0,10) foreach println
     val id1 = "society_2016_oct_25_speak-polish-saturday-school-language-history"
-    assert(false === label(id1))
+    //assert(false === label(id1))
     val id2 = "money_2016_oct_27_maternity-leave-sackings-cost-280m-a-year-says-equality-watchdog"
-    assert(true === label(id2))
+    //assert(true === label(id2))
 
     val values : Iterable[Boolean]= (label unzip)._2
     val nControversy : Int = values.count((x=>x))
@@ -109,6 +109,16 @@ class GuardianTest extends FunSuite {
     val numTrue = validArticles count label.get
     println("%d of %d is controversial(%f)".format(numTrue, validArticles.size, numTrue.toDouble / validArticles.size))
 
+  }
+
+  test("Article title viewer"){
+    val articles : Seq[ArticleStructure] = GuardianDataSet.Tool.getAll().toSeq
+    val w = new BufferedWriter(new FileWriter(new File("article_title.txt")))
+    Range(0,articles.length) foreach { i =>
+      val s = "%d\t".format(i) + articles(i).title
+      w.write(s)
+      w.newLine()
+    }
   }
 
 }

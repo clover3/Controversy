@@ -31,8 +31,8 @@ class LexiconExpander(seedsA : List[String], seedsB : List[String], targetSize: 
       }
 
 
-      val candidateA : List[String] = asScalaBuffer(w2v.knnWords(centroidA, targetSize * 2)).toList
-      val candidateB = asScalaBuffer(w2v.knnWords(centroidB, targetSize * 2)).toList
+      val candidateA : List[String] = asScalaBuffer(w2v.knnWords(centroidA, targetSize * 4)).toList.filterNot(x=> x.contains('_'))
+      val candidateB = asScalaBuffer(w2v.knnWords(centroidB, targetSize * 4)).toList.filterNot(x=> x.contains('_'))
 
       val common : Set[String] = (candidateA++seedsA).intersect(candidateB++seedsB).toSet
 

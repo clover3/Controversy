@@ -32,7 +32,7 @@ object OverlapFeature {
     val validCommonTokens = commonTokens.flatten
     val avgCommon = {
       if (validCommonTokens.size > 0)
-        validCommonTokens.sum.toDouble / validCommonTokens.size
+        validCommonTokens.sum.toDouble / validCommonTokens.size / 100
       else
         0
     }

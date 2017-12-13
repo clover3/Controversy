@@ -8,7 +8,7 @@ object LengthFeature {
       tokens.size
     }
     val arr = comments map countTokens
-    val mean = arr.sum.toDouble/ arr.size
+    val mean = arr.sum.toDouble/ arr.size / 100
     List(mean)
   }
 }

@@ -1,6 +1,7 @@
-import org.scalatest.FunSuite
+package classifier
+
 import libsvm._
-import scala.annotation.meta.param
+import org.scalatest.FunSuite
 import org.umass.ciir.svm.SVMWrap._
 
 
