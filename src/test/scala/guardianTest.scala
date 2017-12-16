@@ -1,10 +1,11 @@
 import java.io.{BufferedWriter, File, FileWriter, PrintWriter}
 
+import scala.io.Source._
 import play.api.libs.json._
 import com.github.tototoshi.csv.CSVReader
 import org.scalatest._
-import org.umass.ciir.feature.GuardianDataSet
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset
+import org.umass.ciir.dataset.GuardianDataSet.{ArticleStructure, Tool}
 
 class GuardianTest extends FunSuite {
   test("expand agree/disagree")
@@ -28,7 +29,7 @@ class GuardianTest extends FunSuite {
       }
     }
     val files :List[File]= getListOfFiles("C:\\work\\Data\\guardian data\\codedpages")
-    val articles = files map (x => new GuardianDataSet.ArticleStructure(x.getAbsolutePath()))
+    val articles = files map (x => new ArticleStructure(x.getAbsolutePath()))
 
     articles foreach { x =>
       println(x.article)
@@ -36,13 +37,13 @@ class GuardianTest extends FunSuite {
   }
 
   test("Article Split Test"){
-    val article : ArticleStructure = GuardianDataSet.Tool.getOne()
-    val paragraphs = GuardianDataSet.Tool.splitArticle(article.article)
+    val article : ArticleStructure = Tool.getOne()
+    val paragraphs = Tool.splitArticle(article.article)
     paragraphs foreach println
   }
 
   test("Guardian to ArsTechnica Format"){
-    val articles = GuardianDataSet.Tool.getAll()
+    val articles = Tool.getAll()
     var counter = 0
     def getName() : String = {
       counter = counter +1
@@ -51,7 +52,7 @@ class GuardianTest extends FunSuite {
     val articlePath = "guardianArticles\\"
     val commentPath = "guardianComments\\"
     articles foreach { article =>
-      val sents = GuardianDataSet.Tool.splitArticle(article.article) map {
+      val sents = Tool.splitArticle(article.article) map {
         s => JsObject(Seq("id" -> JsString(s)))
       }
       val jObj = JsObject(Seq(
@@ -86,7 +87,7 @@ class GuardianTest extends FunSuite {
   }
 
   test("Label Test"){
-    val label = GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels").labels
+    val label = Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels").labels
     println("Total of %d labels".format(label.size))
     label.slice(0,10) foreach println
     val id1 = "society_2016_oct_25_speak-polish-saturday-school-language-history"
@@ -100,8 +101,8 @@ class GuardianTest extends FunSuite {
   }
 
   test("Corpus label count"){
-    val articles : List[ArticleStructure] = GuardianDataSet.Tool.getAll()
-    val label = GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels")
+    val articles : List[ArticleStructure] = Tool.getAll()
+    val label = Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels")
     val validArticles = articles filter (label.contains)
     println("%d of %d has label".format(validArticles.size, articles.size ))
 
@@ -111,8 +112,86 @@ class GuardianTest extends FunSuite {
 
   }
 
+  test("Label agreemnet kappa"){
+    val label = Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels")
+
+
+    def countAgree(idx1 : Int, idx2 : Int) : (Double, Double) = {
+      val f1 = label.rawLabels count( x => x._2(idx1) == "yes")
+      val f2 = label.rawLabels count( x => x._2(idx1) == "no")
+      val g1 = label.rawLabels count( x => x._2(idx2) == "yes")
+      val g2 = label.rawLabels count( x => x._2(idx2) == "no")
+
+      val a =  label.rawLabels count( x => x._2(idx1) == x._2(idx2))
+      val N = label.rawLabels.size
+
+      val p_e :Double = (f1 * g1 + f2 * g2).toDouble / (N*N)
+      val p0 : Double = a.toDouble / N
+      val agree = a.toDouble / N
+      val kappa = (p0-p_e) / (1- p_e)
+      (agree, kappa)
+    }
+
+    val list = List((0,1), (1,2), (2,3), (3,4), (4,5), (5,0))
+
+    val res = (list map (x => countAgree(x._1, x._2)))
+    res foreach{ x=>
+      println("%4f %4f".format(x._1, x._2))
+    }
+  }
+
+  test("Test Shiri agree"){
+    val path = "C:\\work\\Data\\Controversy-DataPackage-Updated2015\\Controversy-DataPackage-Updated2015\\judgments\\judgments-raw-and-avg\\judgments-pages-lightTask-2013-05-15.txt"
+
+    def simple(raw: String) : String = raw match {
+      case "1" => "1"
+      case "2" => "2"
+      case "3" => "3"
+      case "4" => "4"
+    }
+    val data = (fromFile(path).getLines() map { s =>
+      val arr = s.split("\\s")
+      (arr(0), simple(arr(1)))
+    }).toList
+    val groups = data.groupBy{x => x._1}
+    println("Total data : " + data.size)
+
+
+    val multiLabel = groups.filter(x => x._2.size > 1)
+    println("Pages with multi label : ", multiLabel.size)
+    val label = (multiLabel map ( x => (x._1, (x._2 map (_._2)).toSeq))).toList
+    println(label.head)
+
+    def countAgree(idx1 : Int, idx2 : Int) : (Double, Double) = {
+      val f1 = label count( x => x._2(idx1) == "1")
+      val f2 = label count( x => x._2(idx1) == "2")
+      val f3 = label count( x => x._2(idx1) == "3")
+      val f4 = label count( x => x._2(idx1) == "4")
+      println(s"$f1 $f2 $f3 $f4")
+      val g1 = label count( x => x._2(idx2) == "1")
+      val g2 = label count( x => x._2(idx2) == "2")
+      val g3 = label count( x => x._2(idx2) == "3")
+      val g4 = label count( x => x._2(idx2) == "4")
+      println(s"$g1 $g2 $g3 $g4")
+
+      val a =  label count( x => x._2(idx1) == x._2(idx2))
+      val N = label.size
+
+      val p_e :Double = (f1 * g1 + f2 * g2).toDouble / (N*N)
+      val p0 : Double = a.toDouble / N
+      val agree = a.toDouble / N
+      val kappa = (p0-p_e) / (1- p_e)
+      (agree, kappa)
+    }
+    println(countAgree(0,1))
+
+
+
+
+  }
+
   test("Article title viewer"){
-    val articles : Seq[ArticleStructure] = GuardianDataSet.Tool.getAll().toSeq
+    val articles : Seq[ArticleStructure] = Tool.getAll().toSeq
     val w = new BufferedWriter(new FileWriter(new File("article_title.txt")))
     Range(0,articles.length) foreach { i =>
       val s = "%d\t".format(i) + articles(i).title

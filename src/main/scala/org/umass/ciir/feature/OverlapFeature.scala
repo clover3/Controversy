@@ -1,6 +1,6 @@
 package org.umass.ciir.feature
 
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset.GuardianDataSet._
 
 object OverlapFeature {
   def commonToken(str1: String, str2: String): Int = {

@@ -1,6 +1,6 @@
 package org.umass.ciir.classifier
 
-import org.umass.ciir.feature.GuardianDataSet.{ArticleStructure, ControversyLabel}
+import org.umass.ciir.dataset.GuardianDataSet._
 
 import scala.util.Random
 

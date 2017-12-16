@@ -1,6 +1,6 @@
 package org.umass.ciir.feature
 
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset.GuardianDataSet._
 import org.umass.ciir.svm.SVMWrap.Instance
 
 class FeatureGenerator {

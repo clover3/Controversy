@@ -1,7 +1,6 @@
 import java.io.File
 
 import org.scalatest.FunSuite
-import org.umass.ciir.feature.{GuardianDataSet, LDAWrap}
 import cc.mallet.types._
 import cc.mallet.pipe._
 import cc.mallet.pipe.iterator._
@@ -13,14 +12,16 @@ import cc.mallet.types.Alphabet
 import java.util
 import java.util.regex.Pattern
 
-import org.umass.ciir.feature.GuardianDataSet
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset._
+import org.umass.ciir.dataset.GuardianDataSet._
+import org.umass.ciir.feature.LDAWrap
+
 
 class LDATest extends FunSuite {
   test("LDA Test"){
 
     val path = "C:\\work\\Data\\guardian data\\codedpages\\4b9ad79e-931a-4461-b673-160a37421984.json"
-    val article = new GuardianDataSet.ArticleStructure(path)
+    val article = new ArticleStructure(path)
     val corpus = (article.article :: article.comments).asJava
 
     val pipeList = new util.ArrayList[Pipe]
@@ -60,7 +61,7 @@ class LDATest extends FunSuite {
 
   test("LDA Full Test")
   {
-    val articles :List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles :List[ArticleStructure] = Tool.getAll()
     def extract( a : ArticleStructure) : List[String] = {
       a.article :: a.comments.slice(0,10)
     }
@@ -104,7 +105,7 @@ class LDATest extends FunSuite {
   }
 
   test("Estimate Tester"){
-    val articles :List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles :List[ArticleStructure] = Tool.getAll()
     def extract( a : ArticleStructure) : List[String] = {
       a.article :: a.comments.slice(0,10)
     }

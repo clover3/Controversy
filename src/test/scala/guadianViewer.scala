@@ -1,11 +1,10 @@
 
-import org.umass.ciir.feature.GuardianDataSet
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset.GuardianDataSet.{ArticleStructure, Tool}
 
 
 class guadianViewer {
 
-  val articles = GuardianDataSet.Tool.getAll()
+  val articles = Tool.getAll()
 
 
   def searchComment()= articles

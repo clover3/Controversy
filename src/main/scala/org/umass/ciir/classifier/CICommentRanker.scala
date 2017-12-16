@@ -1,6 +1,6 @@
 package org.umass.ciir.classifier
 
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset.GuardianDataSet._
 import org.umass.ciir.feature.OverlapFeature.commonToken
 import org.umass.ciir.feature.{CommentRegression, FeatureGenerator, OverlapFeature}
 

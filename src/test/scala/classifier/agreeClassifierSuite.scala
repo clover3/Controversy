@@ -4,14 +4,13 @@ package classifier
 import java.io._
 
 import org.scalatest.FunSuite
-import org.umass.ciir.feature.GuardianDataSet
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset.GuardianDataSet._
 
 import scala.io.Source
 
 class agreeClassifierSuite extends FunSuite{
   test("output comments"){
-    val articles : Seq[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles : Seq[ArticleStructure] = Tool.getAll()
 
     val allComments : Iterable[String] = (articles map (a => a.comments)).flatten
     val allCommentsNoNewline = allComments map (_.replace("\n", " ").replace("\r", " "))

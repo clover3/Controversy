@@ -1,7 +1,7 @@
 package org.umass.ciir.classifier
 
 import org.umass.ciir.feature.{CommentRegression, FeatureGenerator}
-import org.umass.ciir.feature.GuardianDataSet.{ArticleStructure, ControversyLabel}
+import org.umass.ciir.dataset.GuardianDataSet._
 
 
 class LinearClassifier (X : List[ArticleStructure], label: ControversyLabel) (implicit featureGen: FeatureGenerator)

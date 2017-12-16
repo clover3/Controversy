@@ -2,14 +2,15 @@ import java.io.{File, PrintWriter}
 
 import org.scalatest.FunSuite
 import org.umass.ciir.classifier.CICommentRanker
-import org.umass.ciir.feature.{FeatureGenerator, GuardianDataSet}
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
+import org.umass.ciir.dataset
+import org.umass.ciir.dataset.GuardianDataSet.{ArticleStructure, Tool}
+import org.umass.ciir.feature.{FeatureGenerator}
 import play.api.libs.json.{JsArray, JsObject, JsString}
 
 class commentSelection extends FunSuite {
 
   test("Comment Selection"){
-    val articles: List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles: List[ArticleStructure] = Tool.getAll()
     val featureGen = new FeatureGenerator()
     val ranker = new CICommentRanker(featureGen)
     val articleList = List(14,169, 222) map articles
@@ -25,7 +26,7 @@ class commentSelection extends FunSuite {
 
   test("Generate contrv comment for topic modeling")
   {
-    val articles: List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles: List[ArticleStructure] = Tool.getAll()
     val featureGen = new FeatureGenerator()
     val ranker = new CICommentRanker(featureGen)
 
@@ -34,7 +35,7 @@ class commentSelection extends FunSuite {
     val articlePath = "guardianCtrvArticles\\"
     val commentPath = "guardianCtrvComments\\"
     articles foreach { article =>
-      val sents = GuardianDataSet.Tool.splitArticle(article.article) map {
+      val sents = Tool.splitArticle(article.article) map {
         s => JsObject(Seq("id" -> JsString(s)))
       }
       val jObj = JsObject(Seq(

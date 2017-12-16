@@ -2,8 +2,9 @@ package classifier
 
 import org.scalatest.FunSuite
 import org.umass.ciir.classifier.{ContrClassifier, LingClassifier, RandomClassifier}
-import org.umass.ciir.feature.GuardianDataSet.ArticleStructure
-import org.umass.ciir.feature.{FeatureGenerator, GuardianDataSet}
+import org.umass.ciir.dataset
+import org.umass.ciir.dataset.GuardianDataSet.{ArticleStructure, Tool}
+import org.umass.ciir.feature.FeatureGenerator
 import org.umass.ciir.miscLib._
 import org.umass.ciir.svm.SVMWrap.ParameterTune
 
@@ -16,9 +17,9 @@ class trainTest extends FunSuite {
     //println("Pickling...")
     //GuardianDataSet.Tool.pickleArticle()
 
-    val articles: List[ArticleStructure] = time(GuardianDataSet.Tool.getAll(), "Loading Articles")
+    val articles: List[ArticleStructure] = time(Tool.getAll(), "Loading Articles")
 
-    val label = time(GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels"), "Loading Labels")
+    val label = time(Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels"), "Loading Labels")
 
     val allX = Random.shuffle(articles filter label.contains)
     val trainSize: Int = (allX.size * 0.8).toInt
@@ -50,9 +51,9 @@ class trainTest extends FunSuite {
   test("Parameter Tune")
   {
     Random.setSeed(0)
-    val articles: List[ArticleStructure] = GuardianDataSet.Tool.getAll()
+    val articles: List[ArticleStructure] = Tool.getAll()
 
-    val label = time(GuardianDataSet.Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels"), "Loading Labels")
+    val label = time(Tool.loadLabelAt("C:\\work\\Data\\guardian data\\labels"), "Loading Labels")
 
     val allX = Random.shuffle(articles filter label.contains)
     val trainSize: Int = (allX.size * 0.8).toInt

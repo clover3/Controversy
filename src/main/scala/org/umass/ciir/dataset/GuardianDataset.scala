@@ -1,27 +1,21 @@
-package org.umass.ciir.feature
+package org.umass.ciir.dataset
 
-import scala.io.Source._
-import scala.xml.SAXParseException
-import java.io.File
+import java.io._
 
 import com.github.tototoshi.csv._
+import net.ruippeixotog.scalascraper.browser.JsoupBrowser
+import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
+import net.ruippeixotog.scalascraper.dsl.DSL._
 import play.api.libs.json._
 
-import net.ruippeixotog.scalascraper.dsl.DSL._
-import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
-import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
-
-import net.ruippeixotog.scalascraper.model._
-import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+import scala.io.Source._
+import scala.xml.SAXParseException
+import org.umass.ciir.dataset._
 
-package GuardianDataSet {
-
-  import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
-
-  import scala.collection.mutable
-  import scala.concurrent.duration.Duration
-  import scala.concurrent.{Await, Future}
+package GuardianDataSet{
 
   @SerialVersionUID(100L)
   class ArticleStructure(path: String) extends Serializable {
@@ -82,6 +76,12 @@ package GuardianDataSet {
                                 case "no" => 0}).sum
       if (score*2 > labels.size) (id,true)
       else (id,false)
+    }
+    val rawLabels = group map { x =>
+      val id = x._1
+      val data = (x._2 unzip)._2
+      val labels : IndexedSeq[String] = (data map (x => x(labelIdx))).toIndexedSeq
+      (id,labels)
     }
 
     def contains(x:ArticleStructure) : Boolean = labels.contains(x.id)
@@ -171,6 +171,5 @@ package GuardianDataSet {
       new ControversyLabel(getListOfFiles(dirPath))
     }
   }
-
 }
 
