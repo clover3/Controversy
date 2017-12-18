@@ -10,6 +10,12 @@ object miscLib {
     result
   }
 
+  def topKBy[A,B <% Ordered[B]]( items : List[A], k: Int)( f : A => B) : List[(A,B)] = {
+    val scores = items map f
+    val sorted = (items zip scores).sortBy(_._2)
+    sorted.reverse.slice(0,k)
+  }
+  def average(l : Iterable[Double]) : Double = l.sum / l.size
 
   implicit class ImplDoubleVecUtils(values: Iterable[Double]) {
     def mean = values.sum / values.size

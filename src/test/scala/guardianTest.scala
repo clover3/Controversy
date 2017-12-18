@@ -36,6 +36,14 @@ class GuardianTest extends FunSuite {
     }
   }
 
+  test("article comment parse test"){
+    Tool.getAll() foreach {
+      article =>
+        println(article.title)
+        println(article.commentExs.size)
+    }
+  }
+
   test("Article Split Test"){
     val article : ArticleStructure = Tool.getOne()
     val paragraphs = Tool.splitArticle(article.article)
@@ -200,4 +208,27 @@ class GuardianTest extends FunSuite {
     }
   }
 
+  test("Article comment counter"){
+    val articles : Seq[ArticleStructure] = Tool.getAll().toSeq
+    articles foreach { a =>
+      println("%s comment %d - %d".format(a.title, a.comments.size, a.commentExs.size))
+    }
+  }
+
+  test("Article Split to label"){
+    val w = new BufferedWriter(new FileWriter(new File("apple.txt")))
+    val articles : List[ArticleStructure] = Tool.getAll()
+    articles foreach {
+      article =>
+        if (article.title.contains("Apple has a blip")) {
+          val paragraphs = Tool.splitArticle(article.article)
+          var idx = 0
+          paragraphs foreach { s =>
+            w.write("%d\t%d\t%s\n".format(idx, 0, s))
+            idx = idx + 1
+          }
+        }
+    }
+    w.close()
+  }
 }

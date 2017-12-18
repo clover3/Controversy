@@ -48,10 +48,20 @@ class commentSelection extends FunSuite {
       )
       if(!sents.isEmpty)
       {
-        val f = new PrintWriter(new File(articlePath + article.id))
+        val f = new PrintWriter(new File(articlePath + article.id+ ".json"))
         f.write(jObj.toString())
         f.close()
-        val contrvCommentEx = ranker.topKEx(article, 50)
+        def valid(comment:Map[String,String]) : Boolean = {
+          val text = comment("text")
+          text.size > 20 && !text.contains("This comment was removed by a moderator")
+        }
+        val contrvCommentEx = ranker.topKEx(article, 1000).filter(valid).slice(0,50)
+
+        if(contrvCommentEx.size < 50) {
+          print(contrvCommentEx.size)
+          print(" - ")
+          println(article.id)
+        }
 
         contrvCommentEx foreach { commentEx =>
           val jObj = JsObject(Seq(
@@ -61,7 +71,7 @@ class commentSelection extends FunSuite {
             "cdate" -> JsString(commentEx("timestamp")),
             "name" -> JsString(commentEx("id")),
           ))
-          val f = new PrintWriter(new File(commentPath + commentEx("id")))
+          val f = new PrintWriter(new File(commentPath + commentEx("id") + ".json"))
           f.write(jObj.toString())
           f.close()
         }
