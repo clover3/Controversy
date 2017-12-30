@@ -82,6 +82,20 @@ class ControversyRetrieveTest extends FunSuite{
     }
   }
 
+  test("Sentence Ranking View"){
+    val sl = new SentenceLabel("C:\\work\\Data\\guardian data\\Sentence Label")
+    val tr = new TopicBasedRetrieveEx
+    val tmf : String=>String=>Double = tr.articleRater
+    sl.articles foreach {
+      article => {
+        println(article.id)
+        val rater = tmf(article.id)
+        article.sentences() foreach { s =>
+          println("%2f %s".format(rater(s),s))
+        }
+      }
+    }
+  }
   test("Sentence Ranking"){
     val retriever = new LMRetrieve("resource\\oddScores.txt")
     val sl = new SentenceLabel("C:\\work\\Data\\guardian data\\Sentence Label")

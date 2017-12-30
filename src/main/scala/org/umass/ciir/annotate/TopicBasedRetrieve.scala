@@ -4,7 +4,7 @@ package org.umass.ciir.annotate
 import org.umass.ciir.dataset.GuardianDataSet._
 
 import scala.collection.mutable
-import org.umass.ciir.feature.{NewsTopic, Tokenizer}
+import org.umass.ciir.feature.{NewsTopic, TokenizerForTopic}
 import org.umass.ciir.dataset._
 import org.umass.ciir.miscLib._
 
@@ -16,7 +16,7 @@ class TopicBasedRetrieve {
   val pathParentParam = topicPath + "parentParameter.txt"
   val newsTopic = new NewsTopic(pathTopicWord, pathChildParam, pathParentParam, nTopic)
   val titleList : List[String] = new ControversyList("resource\\controversyList.txt").list.toList
-  val tokenizer = new Tokenizer()
+  val tokenizer = new TokenizerForTopic()
   val titleTokens : Map[String, Array[String]] = (titleList map { x => (x,tokenizer.TokenizerNormalizeStemmer(x).toArray) }).toMap
   val titleMax = 6
   val bgProb = 1E-5
@@ -39,6 +39,7 @@ class TopicBasedRetrieve {
   }
 
 
+  // pick top k from controversy list
   def titleTopK(commentIDs : List[String], k : Int) : List[(String, Double)] = {
     val topicVectors = commentIDs.toArray map newsTopic.topicForComment
     val avgTopic = topicVectors.transpose map ( l => avg(l) )

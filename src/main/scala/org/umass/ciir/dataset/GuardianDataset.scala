@@ -14,6 +14,7 @@ import scala.concurrent.{Await, Future}
 import scala.io.Source._
 import scala.xml.SAXParseException
 import org.umass.ciir.dataset._
+import org.umass.ciir.miscLib._
 
 package GuardianDataSet{
 
@@ -22,7 +23,7 @@ class ArticleStructure(path: String) extends Serializable {
   val rawJson: String = fromFile(path, "utf-8").mkString("").replace("\n","")
   val jsonObj = Json.parse(rawJson)
 
-  val article = (jsonObj \ "response" \ "content" \ "blocks" \ "body" \ 0 \ "bodyHtml").asOpt[String].get
+  val article = (jsonObj \ "response" \ "content" \ "blocks" \ "body" \ 0 \ "bodyHtml").asOpt[String].get.replaceAll ("<.*?>","")
   val commentNode = (jsonObj \ "response" \ "content" \ "blocks"\ "comments").asOpt[JsArray].get
   val title = (jsonObj \ "response" \ "content" \ "webTitle").asOpt[String].get
   def parseComment(node : JsValue) : String = (node \ "text").asOpt[String].get
@@ -116,14 +117,6 @@ object Tool {
   }
 
   def getAllFromCodedPage(): List[ArticleStructure]  = {
-    def getListOfFiles(dir: String):List[File] = {
-      val d = new File(dir)
-      if (d.exists && d.isDirectory) {
-        d.listFiles.filter(_.isFile).toList
-      } else {
-        List[File]()
-      }
-    }
     val files :List[File]= getListOfFiles("C:\\work\\Data\\guardian data\\codedpages")
     val fList = files map (x => Future{new GuardianDataSet.ArticleStructure(x.getAbsolutePath())} )
     fList map {f => Await.result(f, Duration.Inf)}

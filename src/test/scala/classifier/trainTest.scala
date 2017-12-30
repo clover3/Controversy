@@ -1,7 +1,7 @@
 package classifier
 
 import org.scalatest.FunSuite
-import org.umass.ciir.classifier.{ContrClassifier, LingClassifier, RandomClassifier}
+import org.umass.ciir.classifier.{ContrClassifier, LinearClassifier, LingClassifier, RandomClassifier}
 import org.umass.ciir.dataset
 import org.umass.ciir.dataset.GuardianDataSet.{ArticleStructure, Tool}
 import org.umass.ciir.feature.FeatureGenerator
@@ -35,7 +35,7 @@ class trainTest extends FunSuite {
     val featureGenerator = new FeatureGenerator()
     val lingClassifier = time(new LingClassifier(trainX, label)(featureGenerator), "Training...")
     val randomClassifier = new RandomClassifier(trainX, label)
-    val linearClassifier = new LingClassifier(trainX, label)(featureGenerator)
+    val linearClassifier = new LinearClassifier(trainX, label)(featureGenerator)
 
     print("Train\t")
     printAccuracy(lingClassifier, trainX)

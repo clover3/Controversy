@@ -13,7 +13,6 @@ object WordFeature{
 
   object QuotationPortion extends PortionBase {
     def portion(input:String) : Double ={
-      input
       val chars = List('\'','\"')
       val occurrence :Int = (chars map {quote => input.count(_ == quote)}).sum
       occurrence.toDouble / numTokens(input)

@@ -46,6 +46,7 @@ class SentenceLabel(dirPath : String) {
       i <- 0 until article.data.size
     } yield (i, scoreFunction(article.data(i)._2))
     val rank = res.sortBy(- _._2) map (_._1)
+    println(article.id)
     MAP.AP(at, rank, article.getRelevance(threshold))
   }
 

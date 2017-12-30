@@ -16,7 +16,7 @@ class FeatureGenerator {
     val vLength: List[Double] = LengthFeature.getVector(targetComments) // 1
     val vOverlap: List[Double] = OverlapFeature.getVector(x) // 1
     // 2 + 4 + 6 + 1 + 1
-    val doubleV: List[Double] = vPos ::: vWords ::: vLength ::: vOverlap//vAgree ::: vWords ::: vPos ::: vOverlap ::: vLength
+    val doubleV: List[Double] = vAgree ::: vWords ::: vPos ::: vOverlap ::: vLength
     doubleV
   }
   def getVector(commentString : String, overlapV : Double) : List[Double] = {
